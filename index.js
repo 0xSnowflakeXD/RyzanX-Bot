@@ -209,7 +209,7 @@ rx say: Repeat your message and delete the original message
 `)
 })
 
-create('repeat', (msg, args) => {
+create('repeat', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
 	msg.channel.send(args)
 })
