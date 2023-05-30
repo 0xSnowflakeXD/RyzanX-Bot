@@ -210,12 +210,14 @@ rx say: Repeat your message and delete the original message
 })
 
 create('repeat', (msg, args) => {
-	msg.channel.send(args[2])
+	const args = msg.content.split(' ').slice(2).join(' ')
+	msg.channel.send(args)
 })
 
-create('say', (msg, args) => {
+create('say', (msg) => {
+	const args = msg.content.split(' ').slice(2).join(' ')
 	msg.delete()
-	msg.channel.send(args[2])
+	msg.channel.send(args)
 })
 
 process.on('beforeExit', () => {c.destroy(process.env.tk)})
