@@ -204,7 +204,18 @@ Prefix: \`rx <cmd_lowercase>\`
 rx hi: Hello!
 rx dev: Developer Corner help page.
 rx help: This page
+rx repeat: Repeat your message
+rx say: Repeat your message and delete the original message
 `)
+})
+
+create('repeat', (msg, args) => {
+	msg.channel.send(args[2])
+})
+
+create('say', (msg, args) => {
+	msg.delete()
+	msg.channel.send(args[2])
 })
 
 process.on('beforeExit', () => {c.destroy(process.env.tk)})
