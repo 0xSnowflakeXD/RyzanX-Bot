@@ -268,7 +268,7 @@ create('say', (msg) => {
 })
 
 create('internationale', (msg) => {
-	msg.reply({content:'The Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.resolve(path.join(process.cwd(), './res/the-intern~.mp3'))]})
+	msg.reply({content:'This is L\'Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.resolve(path.join(process.cwd(), './res/the-intern~.mp3'))]})
 })
 
 create('updates', (msg) => {
