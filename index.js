@@ -12,7 +12,7 @@ const request = require('request')
 const path = require('path')
 
 // Handlers
-const mh = require('./handler/memhandler')
+const { Memory } = require('./handler/memhandler')
 // const ch = require('./handler/cpuhandler')
 // Handlers End
 
@@ -26,19 +26,15 @@ const mh = require('./handler/memhandler')
 
 requiredir('./server')
 
-setInterval(() => {
-	const x = new mh.Memory().check(32692269664, function(totalmem, freemem, usedmem) {
-		console.warn(`-- MEMORY USAGE CAUTION --
+const memChecker = new Memory(30 * 1000);
+memChecker.on('danger', (used, free, total) => console.warn(`-- MEMORY USAGE CAUTION --
 Caught on: ${Date()}
 Details: Memory use exceeded Repl's limit
 
-Memory Usage: ${usedmem}
-Total Repl Memory: ${totalmem}
-Memory left: ${freemem}
--- END --
-`)
-	})
-}, 5000)
+Memory Usage: ${used}
+Total Repl Memory: ${total}
+Memory left: ${free}
+-- END --`))
 
 const exthandler = new EventEmitter()
 
@@ -170,7 +166,7 @@ rx dev rem: Remove a developer from temporatily memory
 			console.log(`-- Bot Trace Data --
 Load Time:
   |- Login + Code Reading    : ${globalThis.lginEnd - lginStart}
-  |- Memory Handler Load Time: Coming soon.
+  \\-
 Uptime:
   |- System Uptime Milliseconds: ${os.uptime() * 100}
   |- Bot Uptime Milliseconds   : ${c.uptime}
@@ -186,9 +182,9 @@ Client:
   |- Tag           : ${c.user.tag}
   |- Status        : ${c.user.presence.status.toString()}
     \\- Status Message: ${c.user.presence.activities[0].name.toString()}
- -- Bot Trace Data End --
- Data request: ${msg.author.tag} (${msg.author.id})
- Execution Date: ${Date()}`)
+-- Bot Trace Data End --
+Data request: ${msg.author.tag} (${msg.author.id})
+Execution Date: ${Date()}`)
 			msg.channel.send('Sucessful logged bot data to Console.')
 		}
 		if(args[2] == 'add' && args[1] == 'dev') {
@@ -272,14 +268,17 @@ create('say', (msg) => {
 })
 
 create('internationale', (msg) => {
-	msg.reply({content:'The Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.join(process.cwd(), './res/the-intern~.mp3')]})
+	msg.reply({content:'The Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.resolve(path.join(process.cwd(), './res/the-intern~.mp3'))]})
 })
 
 create('updates', (msg) => {
-	msg.reply('Update 1.9046.20\nUpdated `hi` command, allowing it to say hi to specified person. See `rx help` for tutorial and more details.')
+	msg.reply('Update 1.9048.22\nA quick workaround and fixes of `memory handler` by CactusHamster (<@!762771482434600992>)')
 })
 
-process.on('beforeExit', () => {c.destroy(process.env.tk)})
+process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+process.on('exit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+process.on('SIGINT', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+process.on('SIGTERM', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 
 module.exports = {
 	client: c

@@ -4,33 +4,40 @@
 //                  Introducing
 //             Memory Allocation Handler
 // ----------------------------------------------
-// Copyright (c) by James Henry. All rights reserved.
-// One of Advanced Coding Project.
+// By Henry133, later improved by CactusHamster
 
-const os = require('os')
+const { totalmem, freemem } = require('os') // Don't declassify, please
+const { emit: EMIT } = require("process");
+const { EventEmitter }  = require("events")
 
-class Memory {
-	constructor() {
-		this.totalmem = os.totalmem()
-		this.freemem = os.freemem()
-		this.usedmem = this.totalmem - this.freemem
+class Memory extends EventEmitter {
+	/** 
+		@extends {EventEmitter}
+	*/
+  // True if if memory usage is safe.
+  usage () {
+    let usedPercent = (1 - (freemem() / totalmem())) * 100;
+    return usedPercent
+  }
+  // Shutdown if unsafe memory usage.
+	check (limit = 90) {
+    let total = totalmem();
+    let free = freemem();
+    let used = total - free;
+    this.emit("check", used, free, total);
+    // if using more than ${limit}% of memory
+    if ((1 - (free / total)) * 100 > limit) {
+      this.emit("danger", used, free, total);
+      console.warn('Memory usage exceed max safe range, stopping...');
+      EMIT("SIGINT");
+    }
 	}
-	check(maxsafe, fallback_cb) {
-		if(this.usedmem > maxsafe) {
-			function errwarn() {
-				console.warn('Memory usage exceed max safe range, stopping...')
-				process.exit(0x2)
-				return 0xfb
-			}
-			
-			(!!fallback_cb) ? fallback_cb(this?.totalmem, this?.freemem, this?.usedmem) : errwarn()
-			return -1
-		}
-	}
+  constructor (routineMS = 30000) {
+    super();
+    this.interval = setInterval(this.check.bind(this), routineMS)
+  }
 }
 
 console.info('Memory Handler Ready!')
 
-module.exports = {
-	Memory: Memory
-}
+module.exports = { Memory }
