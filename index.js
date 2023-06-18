@@ -8,6 +8,8 @@ const { EventEmitter } = require('events')
 const requiredir = require('require-dir')
 const color = require('colors')
 const os = require('os')
+const request = require('request')
+const path = require('path')
 
 // Handlers
 const mh = require('./handler/memhandler')
@@ -40,6 +42,10 @@ Memory left: ${freemem}
 
 const exthandler = new EventEmitter()
 
+setInterval(function ka() {
+	 ;(function() {request.get('https://ryzanx.henry133.repl.co')})
+},5000)
+
 // Cheating exceptions
 
 process.on('uncaughtException', (e) => {
@@ -49,7 +55,12 @@ process.on('uncaughtException', (e) => {
 
 const command = []
 const slashCommand = []
-const devs = ['927563409409581066','810221998881898507']
+const devs = ['927563409409581066', '752617663888359444']
+const bl = [
+  "229921633199063040",
+  "1096760755174526987",
+  "752617663888359444"
+]
 
 // Replit shutdown cheat
 // function extcall() {require('./rsAssist.js')}
@@ -78,7 +89,8 @@ c.on('ready', () => {
 	// ----
 	c.user.setActivity({name: "Stay with Ukraine!", type: ActivityType.Watching})
 	process.stdout.write(`${color.blue(c.user.tag)} ${color.brightGreen('is ready!')}\n`)
-	process.stdout.write(`\nUser status in raw:\n${color.cyan(c.user.presence)}\n`)
+	async function tokenclear() {c.token = ""}
+	tokenclear().then(_ => {process.stdout.write('Clear token!' + '\n')})
 });
 
 async function create(handler, cb) {
@@ -86,12 +98,25 @@ async function create(handler, cb) {
 }
 
 c.on('messageCreate', async msg => {
+	let prefix = 'rx'
+	if(!msg.content.startsWith(prefix)) return false;
+	if(msg.author.bot === true) return false;
+	if(bl.includes(msg.author.id)) {
+		msg.channel.send('Sorry, but you have been hard-coded to RyzanX blacklist. You can\'t use the bot.')
+		msg.channel.send('If you believe this is an error, please report to Henry133#2436')
+		return false;
+	};
 	command.forEach(c => {
 		const args = msg.content.split(' ')
 		
-		let prefix = 'rx'
-		if(!msg.content.startsWith(prefix)) return false;
-		if(msg.author.bot === true) return false;
+		// let prefix = 'rx'
+		// if(!msg.content.startsWith(prefix)) return false;
+		// if(msg.author.bot === true) return false;
+		// if(bl.includes(msg.author.id)) {
+		// 	msg.channel.send('Sorry, but you have been hard-coded to RyzanX blacklist. You can\'t use the bot.')
+		// 	msg.channel.send('If you believe this is an error, please report to Henry133#2436')
+		// 	return false;
+		// };
 
 		if(args[1].toLowerCase() == c.cn.toLowerCase() && c.cb) {
 			c.cb(msg, args)
@@ -99,7 +124,27 @@ c.on('messageCreate', async msg => {
 	})
 })
 
-create('hi', (msg) => {
+// ANTI BOT
+// c.on('guildMemberAdd', (member) => {
+// 	const date = Date.now()
+//   c.emit('mjoin', date, member)
+// })
+
+// c.on('mjoin', (a, d) => {
+// 	const b = Date.now()
+// 	let c = b - a
+
+// 	if(c <= 250) {
+// 		d.guild.ban(d.id.toString())
+// 	}
+// })
+// ANTI BOT END
+
+create('hi', (msg, args) => {
+	if(!!args[2]) {
+		msg.channel.send('Hello, ' + args[2])
+		return false;
+	}
 	msg.channel.send('Hello!')
 })
 
@@ -150,18 +195,19 @@ Client:
 			devs.push(msg.mentions.users.first().id)
 		}
 		if(args[2] == 'rem' && args[1] == 'dev') {
-			dev.forEach(d => {if(msg.mentions.users.first().id) {d = null}})
+			devs.forEach(d => {if(msg.mentions.users.first().id) {d = null}})
 		}
 		if(args[2] == 'guilds' && args[1] == 'dev') {
 			c.guilds.cache.forEach(g => msg.channel.send(`Name: ${g.name} | ID: ${g.id}`))
 		}
 		if(args[2] == 'users' && args[1] == 'dev') {
-			c.users.cache.forEach(u => msg.channel.send(`Username#Tag: ${u.tag} | ID: ${u.id}`))
+			c.users.cache.forEach(u => msg.channel.send(`Username#Tag: ${u.discriminator == 0 ? u.username : u.tag} | ID: ${u.id}`))
 		}
 		if(args[2] == 'devs' && args[1] == 'dev') {
 			devs.forEach(d => msg.channel.send(d))
 		}
 		if(args[2] == 'eval' && args[1] == 'dev') {
+			if(!devs.includes(msg.author.id)) {msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
 			let out;
 			try {
 				let code = msg.content.split(' ').slice(3).join(" ")
@@ -172,15 +218,19 @@ Client:
 				}
 				if (out instanceof Object && !(out instanceof Promise) && !(out instanceof RegExp)) out = JSON.stringify(out, null, '  ')
 			} catch (e) { out = e }
-			out = out
-				.toString()
-				.replaceAll(c.token, '[CENSORED]')
+			out = out // out.split('').map(char => {
+			// 	let notoken = c.token.split('').map(c => {
+			// 		if(char === c) {return false;} else {return c}
+			// 	})
+			// 	return notoken.join('')
+			// }).join('')
 			if (out.length >= 2000) out = out.slice(0, 1962) + `\n...${out.length - 1962} characters left`
 			msg.channel.send("```js\n" + out.toString() + '```')
 		}
 		if(args[2] == 'stop' && args[1] == 'dev') {
 			if(args[3] == 'confirm') {
-				c.destroy(process.env['tk'])
+				async function cdest() {c.destroy(process.env['tk'])}
+				cdest().then(_ => {process.exit(0)})
 			} else {msg.channel.send('Are you sure to stop the bot? THIS WILL IMMEDIATELY STOP THE BOT AND THE NODE.JS PROCESS!\nDo \`rx dev stop confirm\` to stop the bot.')}
 		}
 		if(args[2] == 'restart' && args[1] == 'dev') {
@@ -195,17 +245,18 @@ Client:
 })
 
 create('help', (msg) => {
-	msg.channel.send(`RyzanX is a collection of features built based on RBot core that have been simplified and optimized.
-Support us: https://replit.com/join/ldywgjxbeq-henry133
+	msg.channel.send(`RyzanX is a collection of experimental in-dev features built based on RBot core idea.
 Thanks for using!
 
 Prefix: \`rx <cmd_lowercase>\`
 
-rx hi: Hello!
-rx dev: Developer Corner help page.
+rx hi: Hello! You can also place member name/mention, for example: rx hi Henry133 -> Hello, Henry133; rx hi @Henry133 -> Hello, @Henry133
+rx dev: Developer Corner help page & subcommands
 rx help: This page
 rx repeat: Repeat your message
 rx say: Repeat your message and delete the original message
+rx internationale: Comrade time! Sing The Internationale toghether with your friends, and have fun!
+rx updates: Development updates
 `)
 })
 
@@ -218,6 +269,14 @@ create('say', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
 	msg.delete()
 	msg.channel.send(args)
+})
+
+create('internationale', (msg) => {
+	msg.reply({content:'The Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.join(process.cwd(), './res/the-intern~.mp3')]})
+})
+
+create('updates', (msg) => {
+	msg.reply('Update 1.9046.20\nUpdated `hi` command, allowing it to say hi to specified person. See `rx help` for tutorial and more details.')
 })
 
 process.on('beforeExit', () => {c.destroy(process.env.tk)})
