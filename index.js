@@ -16,14 +16,6 @@ const { Memory } = require('./handler/memhandler')
 // const ch = require('./handler/cpuhandler')
 // Handlers End
 
-// const cslog = console.log.bind()
-// console.log = () => {
-// 	let args = new Array(arguments)
-// 	args.forEach(a => {
-// 		process.stdout.write(a)
-// 	})
-// }
-
 requiredir('./server')
 
 const memChecker = new Memory(30 * 1000);
@@ -38,9 +30,21 @@ Memory left: ${free}
 
 const exthandler = new EventEmitter()
 
-setInterval(function ka() {
-	 ;(function() {request.get('https://ryzanx.henry133.repl.co')})
-},5000)
+function alive(yourURL) {
+	request.post(
+		yourURL,
+		{ json: { head: 'TModeration Aliver', body: 'KeepAlive Data' } },
+		function(error, response) {
+			if (!error && response.statusCode == 200) {
+				return true
+			}
+		}
+	)
+}
+
+let alive1 = () => alive("https://ryzanx.henry133.repl.co")
+
+setInterval(alive1,5000)
 
 // Cheating exceptions
 
@@ -94,7 +98,24 @@ async function create(handler, cb) {
 }
 
 c.on('messageCreate', async msg => {
+	const args = msg.content.split(' ')
 	let prefix = 'rx'
+// 	if(msg.content === '<@1107664127289212978>' || '<@!1107664127289212978>' && !args[1] && msg.author.bot === false) {
+// 		msg.channel.send(`RyzanX is a collection of experimental in-dev features built based on RBot core idea. The official alternative solution of TModeration Bot
+// Thanks for using!
+
+// Prefix: \`rx <cmd_lowercase>\`
+
+// rx hi: Hello! You can also place member name/mention, for example: \`rx hi Henry133 -> Hello, Henry133\`; \`rx hi @Henry133 -> Hello, @Henry133\`
+// rx dev: Developer Corner help page & subcommands
+// rx help: This page
+// rx repeat: Repeat your message
+// rx say: Repeat your message and delete the original message
+// rx internationale: Comrade time! Sing The Internationale toghether with your friends, and have fun!
+// rx update: Development updates
+// `)
+// 		return false;
+// 	}
 	if(!msg.content.startsWith(prefix)) return false;
 	if(msg.author.bot === true) return false;
 	if(bl.includes(msg.author.id)) {
@@ -104,7 +125,6 @@ c.on('messageCreate', async msg => {
 	};
 	command.forEach(c => {
 		const args = msg.content.split(' ')
-		
 		// let prefix = 'rx'
 		// if(!msg.content.startsWith(prefix)) return false;
 		// if(msg.author.bot === true) return false;
@@ -252,7 +272,7 @@ Thanks for using!
 
 Prefix: \`rx <cmd_lowercase>\`
 
-rx hi: Hello! You can also place member name/mention, for example: \`rx hi Henry133 -> Hello, Henry133\`; \'rx hi @Henry133 -> Hello, @Henry133\`
+rx hi: Hello! You can also place member name/mention, for example: \`rx hi Henry133 -> Hello, Henry133\`; \`rx hi @Henry133 -> Hello, @Henry133\`
 rx dev: Developer Corner help page & subcommands
 rx help: This page
 rx repeat: Repeat your message
@@ -283,7 +303,7 @@ create('updates', (msg) => {
 })
 
 create('update', (msg) => {
-	msg.reply('Update 1.9089.16d\n- Removed SIGKILL anti-termination. Fixed CactusHamster code')
+	msg.reply('Update 1.9114.20\n- Fixed `rx help` command')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
