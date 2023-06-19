@@ -51,7 +51,7 @@ process.on('uncaughtException', (e) => {
 
 const command = []
 const slashCommand = []
-const devs = ['927563409409581066', '752617663888359444']
+const devs = ['927563409409581066', '752617663888359444', '762771482434600992']
 const bl = [
   "229921633199063040",
   "1096760755174526987",
@@ -176,8 +176,8 @@ Repl:
   |- CPU Usage      : ${process.cpuUsage()}
   |- Memory         :
 	  |- Freemem      : ${os.freemem()}
-      \\- Total Memory: ${os.totalmem()}
-	  \\- Storage        : Coming soon.
+    \\- Total Memory: ${os.totalmem()}
+  \\- Storage        : Coming soon.
 Client:
   |- Username      : ${c.user.username}
   |- Tag           : ${c.user.tag}
@@ -279,11 +279,11 @@ create('internationale', (msg) => {
 
 create('updates', (msg) => {
 	// msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
-	msg.reply('Migrated since 1.9080.16b. Use `rx update`')
+	msg.reply('Migrated since 1.9089.16b. Use `rx update`')
 })
 
 create('update', (msg) => {
-	msg.reply('Update 1.9080.16b.\n- Migrated `rx updates`\n- Renamed `rx dev trace` to `rx dev analysis`\n- Beatify `rx help`')
+	msg.reply('Update 1.9089.16c\n- Added SIGKILL anti-termination.')
 })
 
 
@@ -291,6 +291,7 @@ process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), '.
 process.on('exit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGINT', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGTERM', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+process.on('SIGKILL', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 
 module.exports = {
 	client: c
