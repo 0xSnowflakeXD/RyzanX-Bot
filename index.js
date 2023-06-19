@@ -283,15 +283,15 @@ create('updates', (msg) => {
 })
 
 create('update', (msg) => {
-	msg.reply('Update 1.9089.16c\n- Added SIGKILL anti-termination.')
+	msg.reply('Update 1.9089.16d\n- Removed SIGKILL anti-termination. Fixed CactusHamster code')
 })
-
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('exit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGINT', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGTERM', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
-process.on('SIGKILL', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+// process.on('SIGKILL', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+
 
 module.exports = {
 	client: c
