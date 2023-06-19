@@ -10,7 +10,7 @@ const color = require('colors')
 const os = require('os')
 const request = require('request')
 const path = require('path')
-
+const fs = require('fs')
 // Handlers
 const { Memory } = require('./handler/memhandler')
 // const ch = require('./handler/cpuhandler')
@@ -158,7 +158,8 @@ rx dev stop: Stop the bot.
 rx dev restart: Restart the bot.
 rx dev crash: Crash the bot to see if it is restarting.
 rx dev add: Add a developer to temporatily memory.
-rx dev rem: Remove a developer from temporatily memory
+rx dev rem: Remove a developer from temporatily memory.
+rx dev sendfile: Send a file in \`/res/\`.
 `)
 	} else {
 		if(!devs.includes(msg.author.id)) {msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
@@ -201,6 +202,11 @@ Execution Date: ${Date()}`)
 		}
 		if(args[2] == 'devs' && args[1] == 'dev') {
 			devs.forEach(d => msg.channel.send(d))
+		}
+		if(args[2] == 'sendfile' && args[1] == 'dev') {
+			if(!args[3]) {msg.channel.send('File sender. Provide file name in args [4] to send available file in `/res/`'); return false}
+			if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {msg.channel.send('File does NOT exists. Abort!'); return false}
+			msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
 		}
 		if(args[2] == 'eval' && args[1] == 'dev') {
 			if(!devs.includes(msg.author.id)) {msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
@@ -272,7 +278,7 @@ create('internationale', (msg) => {
 })
 
 create('updates', (msg) => {
-	msg.reply('Update 1.9048.22\nA quick workaround and fixes of `memory handler` by CactusHamster (<@!762771482434600992>)')
+	msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
