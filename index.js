@@ -149,7 +149,7 @@ create('dev', (msg, args) => {
 		msg.channel.send(`**Developer Corner**
 These commands is designed for our Developers.
 
-rx dev trace: Return useful bot info for investigating.
+rx dev analysis: Return useful bot info for investigating.
 rx dev guilds: Return list of guilds in format: \`Name: \${g.name} | ID: \${g.id})\`.
 rx dev users: Return cached users (for investigating purposes).
 rx dev devs: Return developers in their IDs and name (If they are cached or reaching them is possible).
@@ -163,7 +163,7 @@ rx dev sendfile: Send a file in \`/res/\`.
 `)
 	} else {
 		if(!devs.includes(msg.author.id)) {msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
-		if(args[2] == 'trace' && args[1] == 'dev') {
+		if(args[2] == 'analysis' && args[1] == 'dev') {
 			console.log(`-- Bot Trace Data --
 Load Time:
   |- Login + Code Reading    : ${globalThis.lginEnd - lginStart}
@@ -252,13 +252,13 @@ Thanks for using!
 
 Prefix: \`rx <cmd_lowercase>\`
 
-rx hi: Hello! You can also place member name/mention, for example: rx hi Henry133 -> Hello, Henry133; rx hi @Henry133 -> Hello, @Henry133
+rx hi: Hello! You can also place member name/mention, for example: \`rx hi Henry133 -> Hello, Henry133\`; \'rx hi @Henry133 -> Hello, @Henry133\`
 rx dev: Developer Corner help page & subcommands
 rx help: This page
 rx repeat: Repeat your message
 rx say: Repeat your message and delete the original message
 rx internationale: Comrade time! Sing The Internationale toghether with your friends, and have fun!
-rx updates: Development updates
+rx update: Development updates
 `)
 })
 
@@ -278,8 +278,14 @@ create('internationale', (msg) => {
 })
 
 create('updates', (msg) => {
-	msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
+	// msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
+	msg.reply('Migrated since 1.9080.16b. Use `rx update`')
 })
+
+create('update', (msg) => {
+	msg.reply('Update 1.9080.16b.\n- Migrated `rx updates`\n- Renamed `rx dev trace` to `rx dev analysis`\n- Beatify `rx help`')
+})
+
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('exit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
