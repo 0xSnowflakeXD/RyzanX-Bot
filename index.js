@@ -303,13 +303,29 @@ create('updates', (msg) => {
 })
 
 create('update', (msg) => {
-	msg.reply('Update 1.9114.20\n- Fixed `rx help` command')
+	msg.reply('Update 1.9126.20\n- Have an uplifted error-prevention system')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('exit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGINT', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGTERM', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.log('Unhandled Rejection at:', promise, 'reason:', reason)
+	const childp = require('child_process')
+	async function exiterr() {process.exit(-1)}
+
+	exiterr().then(_ => {child_process.spawn('node', './rsAssist.js')})
+});
+
+process.on('uncaughtException', (error) => {
+  console.log('Error: ' + error)
+	const childp = require('child_process')
+	async function exiterr() {process.exit(-1)}
+
+	exiterr().then(_ => {child_process.spawn('node', './rsAssist.js')})
+});
 // process.on('SIGKILL', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 
 
