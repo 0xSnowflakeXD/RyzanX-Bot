@@ -2,7 +2,7 @@ console.clear()
 
 const lginStart = new Date().getTime()
 
-const { Client, GatewayIntentBits, EmbedBuilder, ActivityType } = require('discord.js')
+const { Client, GatewayIntentBits, EmbedBuilder, ActivityType, SlashCommandBuilder, REST, Routes } = require('discord.js')
 const { promisify } = require('util')
 const { EventEmitter } = require('events')
 const requiredir = require('require-dir')
@@ -97,6 +97,10 @@ async function create(handler, cb) {
 	command.push({cn:handler, cb:cb})
 }
 
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 c.on('messageCreate', async msg => {
 	const args = msg.content.split(' ')
 	let prefix = 'rx'
@@ -119,6 +123,8 @@ c.on('messageCreate', async msg => {
 	if(!msg.content.startsWith(prefix)) return false;
 	if(msg.author.bot === true) return false;
 	if(bl.includes(msg.author.id)) {
+		msg.channel.sendTyping()
+		sleep(200)
 		msg.channel.send('Sorry, but you have been hard-coded to RyzanX blacklist. You can\'t use the bot.')
 		msg.channel.send('If you believe this is an error, please report to Henry133#2436')
 		return false;
@@ -159,10 +165,12 @@ c.on('messageCreate', async msg => {
 create('hi', (msg, args) => {
 	if(!!args[2]) {
 		msg.channel.sendTyping()
+		sleep(100)
 		msg.channel.send('Hello, ' + args[2])
 		return false;
 	}
 	msg.channel.sendTyping()
+	sleep(100)
 	msg.channel.send('Hello!')
 })
 
@@ -209,6 +217,7 @@ Client:
 Data request: ${msg.author.tag} (${msg.author.id})
 Execution Date: ${Date()}`)
 			msg.channel.sendTyping()
+			sleep(100)
 			msg.channel.send('Sucessful logged bot data to Console.')
 		}
 		if(args[2] == 'add' && args[1] == 'dev') {
@@ -219,20 +228,24 @@ Execution Date: ${Date()}`)
 		}
 		if(args[2] == 'guilds' && args[1] == 'dev') {
 			msg.channel.sendTyping()
+			sleep(100)
 			c.guilds.cache.forEach(g => msg.channel.send(`Name: ${g.name} | ID: ${g.id}`))
 		}
 		if(args[2] == 'users' && args[1] == 'dev') {
 			msg.channel.sendTyping()
+			sleep(100)
 			c.users.cache.forEach(u => msg.channel.send(`Username#Tag: ${u.discriminator == 0 ? u.username : u.tag} | ID: ${u.id}`))
 		}
 		if(args[2] == 'devs' && args[1] == 'dev') {
 			msg.channel.sendTyping()
+			sleep(100)
 			devs.forEach(d => msg.channel.send(d))
 		}
 		if(args[2] == 'sendfile' && args[1] == 'dev') {
 			if(!args[3]) {msg.channel.send('File sender. Provide file name in args [4] to send available file in `/res/`'); return false}
 			if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {msg.channel.send('File does NOT exists. Abort!'); return false}
 			msg.channel.sendTyping()
+			sleep(100)
 			msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
 		}
 		if(args[2] == 'eval' && args[1] == 'dev') {
@@ -248,6 +261,7 @@ Execution Date: ${Date()}`)
 				if (out instanceof Object && !(out instanceof Promise) && !(out instanceof RegExp)) out = JSON.stringify(out, null, '  ')
 			} catch (e) { out = e }
 			msg.channel.sendTyping()
+			sleep(100)
 			out = out // out.split('').map(char => {
 			// 	let notoken = c.token.split('').map(c => {
 			// 		if(char === c) {return false;} else {return c}
@@ -299,23 +313,27 @@ create('say', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
 	msg.delete()
 	msg.channel.sendTyping()
+	sleep(100)
 	msg.channel.send(args)
 })
 
 create('internationale', (msg) => {
 	msg.channel.sendTyping()
+	sleep(100)
 	msg.reply({content:'This is L\'Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.resolve(path.join(process.cwd(), './res/the-intern~.mp3'))]})
 })
 
 create('updates', (msg) => {
 	msg.channel.sendTyping()
 	// msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
+	sleep(100)
 	msg.reply('Migrated since 1.9089.16b. Use `rx update`')
 })
 
 create('update', (msg) => {
 	msg.channel.sendTyping()
-	msg.reply('Update 1.9128.20\n- Added typing feature to 90% of commands (help pages and `repeat` command is excluded)')
+	sleep(100)
+	msg.reply('Update 1.9128.50\n- Added `sleep` function\n- Add a 100ms delay to fix the typing feature ran after a message have been sent.')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
