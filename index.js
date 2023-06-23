@@ -312,6 +312,7 @@ create('repeat', (msg) => {
 create('say', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
 	msg.delete()
+	sleep(100)
 	msg.channel.sendTyping()
 	sleep(100)
 	msg.channel.send(args)
@@ -333,7 +334,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9128.50\n- Added `sleep` function\n- Add a 100ms delay to fix the typing feature ran after a message have been sent.')
+	msg.reply('Update 1.9128.50b\n- Fixed `say` command delay.')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
