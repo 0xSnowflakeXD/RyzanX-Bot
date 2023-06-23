@@ -158,9 +158,11 @@ c.on('messageCreate', async msg => {
 
 create('hi', (msg, args) => {
 	if(!!args[2]) {
+		msg.channel.sendTyping()
 		msg.channel.send('Hello, ' + args[2])
 		return false;
 	}
+	msg.channel.sendTyping()
 	msg.channel.send('Hello!')
 })
 
@@ -206,6 +208,7 @@ Client:
 -- Bot Trace Data End --
 Data request: ${msg.author.tag} (${msg.author.id})
 Execution Date: ${Date()}`)
+			msg.channel.sendTyping()
 			msg.channel.send('Sucessful logged bot data to Console.')
 		}
 		if(args[2] == 'add' && args[1] == 'dev') {
@@ -215,21 +218,25 @@ Execution Date: ${Date()}`)
 			devs.forEach(d => {if(msg.mentions.users.first().id) {d = null}})
 		}
 		if(args[2] == 'guilds' && args[1] == 'dev') {
+			msg.channel.sendTyping()
 			c.guilds.cache.forEach(g => msg.channel.send(`Name: ${g.name} | ID: ${g.id}`))
 		}
 		if(args[2] == 'users' && args[1] == 'dev') {
+			msg.channel.sendTyping()
 			c.users.cache.forEach(u => msg.channel.send(`Username#Tag: ${u.discriminator == 0 ? u.username : u.tag} | ID: ${u.id}`))
 		}
 		if(args[2] == 'devs' && args[1] == 'dev') {
+			msg.channel.sendTyping()
 			devs.forEach(d => msg.channel.send(d))
 		}
 		if(args[2] == 'sendfile' && args[1] == 'dev') {
 			if(!args[3]) {msg.channel.send('File sender. Provide file name in args [4] to send available file in `/res/`'); return false}
 			if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {msg.channel.send('File does NOT exists. Abort!'); return false}
+			msg.channel.sendTyping()
 			msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
 		}
 		if(args[2] == 'eval' && args[1] == 'dev') {
-			if(!devs.includes(msg.author.id)) {msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
+			if(!devs.includes(msg.author.id)) {msg.channel.sendTyping(); msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
 			let out;
 			try {
 				let code = msg.content.split(' ').slice(3).join(" ")
@@ -240,6 +247,7 @@ Execution Date: ${Date()}`)
 				}
 				if (out instanceof Object && !(out instanceof Promise) && !(out instanceof RegExp)) out = JSON.stringify(out, null, '  ')
 			} catch (e) { out = e }
+			msg.channel.sendTyping()
 			out = out // out.split('').map(char => {
 			// 	let notoken = c.token.split('').map(c => {
 			// 		if(char === c) {return false;} else {return c}
@@ -290,20 +298,24 @@ create('repeat', (msg) => {
 create('say', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
 	msg.delete()
+	msg.channel.sendTyping()
 	msg.channel.send(args)
 })
 
 create('internationale', (msg) => {
+	msg.channel.sendTyping()
 	msg.reply({content:'This is L\'Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.resolve(path.join(process.cwd(), './res/the-intern~.mp3'))]})
 })
 
 create('updates', (msg) => {
+	msg.channel.sendTyping()
 	// msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
 	msg.reply('Migrated since 1.9089.16b. Use `rx update`')
 })
 
 create('update', (msg) => {
-	msg.reply('Update 1.9126.20\n- Have an uplifted error-prevention system')
+	msg.channel.sendTyping()
+	msg.reply('Update 1.9128.20\n- Added typing feature to 90% of commands (help pages and `repeat` command is excluded)')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
