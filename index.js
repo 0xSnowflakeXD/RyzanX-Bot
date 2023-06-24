@@ -351,7 +351,7 @@ create('sendfile', (msg, args) => {
 	}
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.channel.send({content: args[3], files: [{attachment: path.resolve(path.join(process.cwd(), './res/' + args[3])), name: args[3]}]})
+	msg.channel.send({content: args[2], files: [path.resolve(path.join(process.cwd(), './res/' + args[2]))]})
 })
 
 create('listfile', (msg) => {
