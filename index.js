@@ -339,7 +339,7 @@ create('internationale', (msg) => {
 })
 
 create('sendfile', (msg, args) => {
-	const filename = msg.content.slice(2)
+	const filename = msg.content.split(' ').slice(2)
 	if(!filename || filename === '') {
 		msg.channel.sendTyping()
 		sleep(100)
