@@ -344,7 +344,7 @@ create('sendfile', (msg, args) => {
 		sleep(100)
 		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return 
 	}
-	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {
+	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[2])))) {
 		msg.channel.sendTyping()
 		sleep(100)
 		msg.channel.send('File does NOT exists. Abort!'); return false
