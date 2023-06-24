@@ -339,7 +339,7 @@ create('internationale', (msg) => {
 })
 
 create('sendfile', (msg, args) => {
-	if(!args[3]) {
+	if(!args[2]) {
 		msg.channel.sendTyping()
 		sleep(100)
 		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return 
@@ -351,7 +351,7 @@ create('sendfile', (msg, args) => {
 	}
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
+	msg.channel.send({content: args[3], files: [{attachment: path.resolve(path.join(process.cwd(), './res/' + args[3])), name: args[3]}]})
 })
 
 create('listfile', (msg) => {
@@ -373,7 +373,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9450.12\n- Added command tweaks for RyzanX Developers.\nUpdate 1.9450.12b\n- Fixed `listfile command`')
+	msg.reply('Update 1.9450.12\n- Added command tweaks for RyzanX Developers.\nUpdate 1.9450.12b\n- Fixed `listfile` command\nUpdate 1.9450.12c\n- Fixed `sendfile` command not working')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
