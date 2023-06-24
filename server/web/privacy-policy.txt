@@ -1,0 +1,8 @@
+Privacy Policy for RyzanX:
+
+By using RyzanX, you agree to the following privacy policy:
+- Collection of User Information: The owner of RyzanX has permission to collect your username, tag, and user ID for the purpose of investigating any misuse or abuse of the bot. This information will never be shared with any third-party without your consent.
+- Request for Server Invite: In certain cases, the owner of RyzanX may request an invite to a server that he suspects of violating the bot's terms of service. This request will be made only in cases where there is a suspicion of misuse or abuse of the bot.
+- No Collection of Bot Usage Data: We do not collect any data on how you use RyzanX. Your privacy is important to us, and we do not track or monitor your usage of the bot.
+
+We take your privacy seriously and will do everything in our power to protect your information. By using RyzanX, you agree to the terms of this privacy policy. If you have any questions or concerns about our privacy policy, please contact the owner: Henry133#2436

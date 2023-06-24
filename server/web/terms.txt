@@ -1,5 +1,8 @@
-No gay
-No exploit
-No cancer
-No toxic
-Thanks
+Terms of Service for RyzanX:
+By using RyzanX, you agree to abide by the following terms and conditions:
+- Do not abuse the bot: Any attempt to misuse or abuse RyzanX is strictly prohibited. This includes but is not limited to spamming, flooding, or using the bot to harass other users.
+- Do not underrate the bot: RyzanX has been designed to provide innovative and useful features to enhance your projects. Please do not underestimate its capabilities, as you may regret it in the future.
+- Do not use the bot for bad purposes: The use of RyzanX for any illegal or unethical purposes is strictly prohibited. This includes but is not limited to hacking, phishing, or any other malicious activity.
+- Do not claim the bot as your own: RyzanX is the result of the collaborative efforts of Henry133, 4TechGuns, and kiwibirb. It is not to be claimed as your own, and any attempt to do so will result in legal action.
+
+By using RyzanX, you agree to comply with these terms and conditions. Failure to do so may result in the termination of your access to the bot.

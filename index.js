@@ -2,7 +2,7 @@ console.clear()
 
 const lginStart = new Date().getTime()
 
-const { Client, GatewayIntentBits, EmbedBuilder, ActivityType, SlashCommandBuilder, REST, Routes } = require('discord.js')
+const { Client, GatewayIntentBits, EmbedBuilder, ActivityType, Intents } = require('discord.js')
 const { promisify } = require('util')
 const { EventEmitter } = require('events')
 const requiredir = require('require-dir')
@@ -78,6 +78,7 @@ const c = new Client({intents:
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.GuildMessageTyping,
 		GatewayIntentBits.DirectMessages,
+		GatewayIntentBits.GuildPresences
 	]
 })
 
@@ -241,13 +242,13 @@ Execution Date: ${Date()}`)
 			sleep(100)
 			devs.forEach(d => msg.channel.send(d))
 		}
-		if(args[2] == 'sendfile' && args[1] == 'dev') {
-			if(!args[3]) {msg.channel.send('File sender. Provide file name in args [4] to send available file in `/res/`'); return false}
-			if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {msg.channel.send('File does NOT exists. Abort!'); return false}
-			msg.channel.sendTyping()
-			sleep(100)
-			msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
-		}
+		// if(args[2] == 'sendfile' && args[1] == 'dev') {
+		// 	if(!args[3]) {msg.channel.send('File sender. Provide file name in args [4] to send available file in `/res/`'); return false}
+		// 	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {msg.channel.send('File does NOT exists. Abort!'); return false}
+		// 	msg.channel.sendTyping()
+		// 	sleep(100)
+		// 	msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
+		// }
 		if(args[2] == 'eval' && args[1] == 'dev') {
 			if(!devs.includes(msg.author.id)) {msg.channel.sendTyping(); msg.channel.send('YOU ARE NOT PERMITTED TO PEFORM THIS ACTION'); return false}
 			let out;
@@ -260,8 +261,6 @@ Execution Date: ${Date()}`)
 				}
 				if (out instanceof Object && !(out instanceof Promise) && !(out instanceof RegExp)) out = JSON.stringify(out, null, '  ')
 			} catch (e) { out = e }
-			msg.channel.sendTyping()
-			sleep(100)
 			out = out // out.split('').map(char => {
 			// 	let notoken = c.token.split('').map(c => {
 			// 		if(char === c) {return false;} else {return c}
@@ -324,6 +323,29 @@ create('internationale', (msg) => {
 	msg.reply({content:'This is L\'Internationale song (instrumental). Sing with your friends, server members, and have a great moment!', files: [path.resolve(path.join(process.cwd(), './res/the-intern~.mp3'))]})
 })
 
+create('sendfile', (msg, args) => {
+	if(!args[3]) {
+		msg.channel.sendTyping()
+		sleep(100)
+		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return 
+	}
+	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + args[3])))) {
+		msg.channel.sendTyping()
+		sleep(100)
+		msg.channel.send('File does NOT exists. Abort!'); return false
+	}
+	msg.channel.sendTyping()
+	sleep(100)
+	msg.channel.send({content: args[3], files: [path.resolve(path.join(process.cwd(), './res/' + args[3]))]})
+})
+
+create('listfile', (msg) => {
+	msg.channel.sendTyping()
+	sleep(100)
+	let dir = fs.readdirSync(path.resolve(path.join(process.cwd(), './res/')))
+	msg.channel.send(dir.map(d => {return d + '\n'}).toString())
+})
+
 create('updates', (msg) => {
 	msg.channel.sendTyping()
 	// msg.reply('Update 1.9089.16\nAdded local file sender `rx dev sendfile`. Seek `rx dev` for more details and usage.')
@@ -334,7 +356,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9128.50b\n- Fixed `say` command delay.')
+	msg.reply('Update 1.9225.28\n**- Added privacy policy and terms of service**\n- Remove `eval` typing feature\n- Made `rx dev sendfile` become an user command (`rx sendfile`)\n- Added command `rx sendfile` and `rx listfile`; Removed `rx dev sendfile`')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
