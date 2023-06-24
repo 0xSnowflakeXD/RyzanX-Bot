@@ -95,7 +95,7 @@ c.on('ready', () => {
 });
 
 async function create(handler, cb) {
-	command.push({cn:handler, cb:cb})
+	command.push({cn:handler, cb:cb, ID: Math.floor(Math.random() * 100)})
 }
 
 async function sleep(ms) {
@@ -121,7 +121,7 @@ c.on('messageCreate', async msg => {
 // `)
 // 		return false;
 // 	}
-	if(!msg.content.startsWith(prefix)) return false;
+	if(!msg.content.toLowerCase().startsWith(prefix)) return false;
 	if(msg.author.bot === true) return false;
 	if(bl.includes(msg.author.id)) {
 		msg.channel.sendTyping()
@@ -141,7 +141,7 @@ c.on('messageCreate', async msg => {
 		// 	return false;
 		// };
 
-		if(args[1].toLowerCase() == c.cn.toLowerCase() && c.cb) {
+		if(args[1].toLowerCase() == c.cn.toLowerCase() && c.cb instanceof Function) {
 			c.cb(msg, args)
 		}
 	})
@@ -284,6 +284,21 @@ Execution Date: ${Date()}`)
 			msg.channel.send('Crashing bot...')
 			throw new Error('crashcall')
 		}
+		if(args[2] == 'cinfo' && args[1] == 'dev') {
+			if(!args[3]) {
+				msg.channel.send('Command ID & list:')
+				command.forEach(c => {
+					msg.channel.send(`ID: ${c['ID']}\nName: ${c.cn}`)
+				})
+				msg.channel.send('Provide a command ID in next argument to get details and info about the command.')
+				return false;
+			}
+			command.forEach(c => {
+				if(parseInt(args[3]) === parseInt(c['ID'])) {
+					msg.channel.send(`\`${c.cn}\` command info\n- Command ID: ${c['ID']}\n- Command Name: ${c.cn}\n- Command callback:\n\`\`\`js\n${c.cb.toString()}\n\`\`\``)
+				}
+			})
+		}
 	}
 })
 
@@ -356,7 +371,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9225.28\n**- Added privacy policy and terms of service**\n- Remove `eval` typing feature\n- Made `rx dev sendfile` become an user command (`rx sendfile`)\n- Added command `rx sendfile` and `rx listfile`; Removed `rx dev sendfile`')
+	msg.reply('Update 1.9450.12\n- Added command tweaks for RyzanX Developers.')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
