@@ -355,10 +355,12 @@ create('sendfile', (msg, args) => {
 })
 
 create('listfile', (msg) => {
-	msg.channel.sendTyping()
-	sleep(100)
 	let dir = fs.readdirSync(path.resolve(path.join(process.cwd(), './res/')))
-	msg.channel.send(dir.map(d => {return d + '\n'}).toString())
+	dir.forEach(file => {
+		msg.channel.sendTyping()
+		sleep(100)
+		msg.channel.send(file)
+	})
 })
 
 create('updates', (msg) => {
@@ -371,7 +373,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9450.12\n- Added command tweaks for RyzanX Developers.')
+	msg.reply('Update 1.9450.12\n- Added command tweaks for RyzanX Developers.\nUpdate 1.9450.12b\n- Fixed `listfile command`')
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
