@@ -55,7 +55,7 @@ process.on('uncaughtException', (e) => {
 
 const command = []
 const slashCommand = []
-const devs = ['927563409409581066', '752617663888359444', '762771482434600992']
+const devs = ['238859849641754636', '927563409409581066', '752617663888359444', '762771482434600992', '810221998881898507']
 const bl = [
   "229921633199063040",
   "1096760755174526987",
@@ -88,14 +88,14 @@ c.on('ready', () => {
 	// ----
 	globalThis.lginEnd = new Date().getTime()
 	// ----
-	c.user.setActivity({name: "Stay with Ukraine!", type: ActivityType.Watching})
+	c.user.setActivity({name: `${c.guilds.cache.size} guilds | RyzanX's Lightray Photons`, type: ActivityType.Watching})
 	process.stdout.write(`${color.blue(c.user.tag)} ${color.brightGreen('is ready!')}\n`)
 	async function tokenclear() {c.token = ""}
 	tokenclear().then(_ => {process.stdout.write('Clear token!' + '\n')})
 });
 
 async function create(handler, cb) {
-	command.push({cn:handler, cb:cb, ID: Math.floor(Math.random() * 100)})
+	command.push({cn:handler, cb:cb, ID: Math.floor(Math.random() * Math.floor(Math.random() * 50) * 100), ts: Date.now()})
 }
 
 async function sleep(ms) {
@@ -295,7 +295,7 @@ Execution Date: ${Date()}`)
 			}
 			command.forEach(c => {
 				if(parseInt(args[3]) === parseInt(c['ID'])) {
-					msg.channel.send(`\`${c.cn}\` command info\n- Command ID: ${c['ID']}\n- Command Name: ${c.cn}\n- Command callback:\n\`\`\`js\n${c.cb.toString()}\n\`\`\``)
+					msg.channel.send(`\`${c.cn}\` command info\n- Command ID: ${c['ID']}\n- Command Name: ${c.cn}\n- Command Registered Timestamp: ${c.ts}\n- Command callback:\n\`\`\`js\n${c.cb.toString()}\n\`\`\``)
 				}
 			})
 		}
@@ -315,16 +315,21 @@ rx repeat: Repeat your message
 rx say: Repeat your message and delete the original message
 rx internationale: Comrade time! Sing The Internationale toghether with your friends, and have fun!
 rx update: Development updates
+rx sendfile: Send some file
+rx listfile: List available files to send
+rx bot-security-leak-preview: Henry133 tried to leak his security hole for LIMITED time. USE THIS CODE WITH INSTRUCTION TO DESTROY THE BOT!
 `)
 })
 
 create('repeat', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
+	if(!args) {msg.channel.send('Well, say something in next argument, please?'); return false}
 	msg.channel.send(args)
 })
 
 create('say', (msg) => {
 	const args = msg.content.split(' ').slice(2).join(' ')
+	if(!args) {msg.channel.send('Well, say something in next argument, please?'); return false}
 	msg.delete()
 	sleep(100)
 	msg.channel.sendTyping()
@@ -342,12 +347,12 @@ create('sendfile', (msg, args) => {
 	const filename = msg.content.split(' ').slice(2).join(' ')
 	if(!filename || filename === '') {
 		msg.channel.sendTyping()
-		sleep(100)
-		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return 
+		sleep(200)
+		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return false
 	}
-	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename)))) {
+	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) || filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/')) {
 		msg.channel.sendTyping()
-		sleep(100)
+		sleep(200)
 		msg.channel.send('File does NOT exists. Abort!'); return false
 	}
 	msg.channel.sendTyping()
@@ -374,7 +379,11 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9508.19\n- A little file sender (`sendfile`) improvement.')
+	msg.reply('Update 1.9670.20\n- Few tweaks')
+})
+
+create('bot-security-leak-preview', (msg) => {
+	msg.channel.send({content: 'Here is the developer passcode. Contact `henry133.dev` to get access to our limited API. And then, use the passcode to continue breaking the bot. Enjoy!', files: [path.resolve(path.join(process.cwd(), './res/' + filename))]})
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
