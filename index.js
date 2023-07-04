@@ -55,11 +55,10 @@ process.on('uncaughtException', (e) => {
 
 const command = []
 const slashCommand = []
-const devs = ['238859849641754636', '927563409409581066', '752617663888359444', '762771482434600992', '810221998881898507']
+const devs = ['1010354519495954452', '238859849641754636', '927563409409581066', '752617663888359444', '762771482434600992', '810221998881898507']
 const bl = [
   "229921633199063040",
-  "1096760755174526987",
-  "752617663888359444"
+  "1096760755174526987"
 ]
 
 // Replit shutdown cheat
@@ -235,7 +234,12 @@ Execution Date: ${Date()}`)
 		if(args[2] == 'users' && args[1] == 'dev') {
 			msg.channel.sendTyping()
 			sleep(100)
-			c.users.cache.forEach(u => msg.channel.send(`Username#Tag: ${u.discriminator == 0 ? u.username : u.tag} | ID: ${u.id}`))
+			const mapper = c.users.cache.map(u => {
+        return (u.bot) ? `` : `${u.discriminator == 0 ? u.username : u.tag} | ${u.id}\n`
+			})
+			let join = mapper.join('')
+			if (join.length >= 2000) join = join.slice(0, 1965) + `\n...${join.length - 1965} characters left`
+			msg.channel.send(join)
 		}
 		if(args[2] == 'devs' && args[1] == 'dev') {
 			msg.channel.sendTyping()
@@ -260,14 +264,14 @@ Execution Date: ${Date()}`)
 					out = 'undefined'
 				}
 				if (out instanceof Object && !(out instanceof Promise) && !(out instanceof RegExp)) out = JSON.stringify(out, null, '  ')
-			} catch (e) { out = e }
+			} catch (e) { out = e.message }
 			out = out // out.split('').map(char => {
 			// 	let notoken = c.token.split('').map(c => {
 			// 		if(char === c) {return false;} else {return c}
 			// 	})
 			// 	return notoken.join('')
 			// }).join('')
-			if (out.length >= 2000) out = out.slice(0, 1962) + `\n...${out.length - 1962} characters left`
+			if (out.length >= 2000) out = out.slice(0, 1965) + `\n...${out.length - 1965} characters left`
 			msg.channel.send("```js\n" + out.toString() + '```')
 		}
 		if(args[2] == 'stop' && args[1] == 'dev') {
@@ -318,6 +322,9 @@ rx update: Development updates
 rx sendfile: Send some file
 rx listfile: List available files to send
 rx bot-security-leak-preview: Henry133 tried to leak his security hole for LIMITED time. USE THIS CODE WITH INSTRUCTION TO DESTROY THE BOT!
+rx ban: (Permanently) Ban users for specific reason. Usage: \`rx ban @user reason\` (MENTION ONLY)
+rx kick: Kick users for specific reason. Usage: \`rx kick @user reason\` (MENTION ONLY)
+rx timeout: Timeout members. Usage: \`rx timeout @user duration_in_minutes reason\`
 `)
 })
 
@@ -350,14 +357,14 @@ create('sendfile', (msg, args) => {
 		sleep(200)
 		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return false
 	}
-	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) || filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/')) {
+	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) || filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/') || filename.startsWith('.') || filename.startsWith('$') || filename.includes('/../') || filename.includes('/.../') || filename.includes('./') || filename.includes('/.'))) {
 		msg.channel.sendTyping()
 		sleep(200)
 		msg.channel.send('File does NOT exists. Abort!'); return false
 	}
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.channel.send({content: filename, files: [path.resolve(path.join(process.cwd(), './res/' + filename))]})
+	msg.channel.send({content: filename, files: [path.resolve('./res/' + filename)]})
 })
 
 create('listfile', (msg) => {
@@ -383,7 +390,50 @@ create('update', (msg) => {
 })
 
 create('bot-security-leak-preview', (msg) => {
-	msg.channel.send({content: 'Here is the developer passcode. Contact `henry133.dev` to get access to our limited API. And then, use the passcode to continue breaking the bot. Enjoy!', files: [path.resolve(path.join(process.cwd(), './res/' + filename))]})
+	msg.channel.send({content: 'Here is the developer passcode. Contact `henry133.dev` to get access to our limited API. And then, use the passcode to continue breaking the bot. Enjoy!', files: [path.resolve(path.join(process.cwd(), './res/developer-passcode.mp3'))]})
+})
+
+create('ban', (msg) => {
+	msg.channel.sendTyping()
+	const target = msg.mentions.users.first().id
+	const reason = msg.content.split(' ').slice(3).join(' ')
+	msg.guild.bans.create(target, {reason: (reason.toString() ? reason.toString() : '')})
+		.then(_ => {
+			msg.channel.send(`User <@${target}> has been banned by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'}`)
+			msg.guild.members.resolve(target).send(`You have been banned by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'}`)
+		})
+		.catch(e => {
+			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Ban <@${target}> for ${reason.toString() ? reason.toString() : '(no reason provided)'}`)
+		})
+})
+
+create('kick', (msg) => {
+	msg.channel.sendTyping()
+	const target = msg.guild.members.resolve(msg.mentions.users.first().id)
+	const reason = msg.content.split(' ').slice(3).join(' ')
+	target.kick(reason.toString() ? reason.toString() : '')
+		.then(_ => {
+			msg.channel.send(`User <@${target.user.id}> has been kicked by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'}`)
+			target.send(`You have been kicked by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'}`)
+		})
+		.catch(e => {
+			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Kick <@${target}> for ${reason.toString() ? reason.toString() : '(no reason provided)'}`)
+		})
+})
+
+create('timeout', (msg) => {
+	msg.channel.sendTyping()
+	const target = msg.guild.members.resolve(msg.mentions.users.first().id)
+	const time = parseInt(msg.content.split(' ')[2]) * 1000 * 60
+	const reason = msg.content.split(' ').slice(4).join(' ')
+	target.timeout(time ? time : 5 * 1000 * 60, reason.toString() ? reason.toString() : '')
+		.then(_ => {
+			msg.channel.send(`User <@${target.user.id}> has been timed-out by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'} for ${time ? time : 5}m`)
+			target.send(`You have been timed-out by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'} for ${time ? time : 5}m`)
+		})
+		.catch(e => {
+			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Timeout <@${target}> for ${reason.toString() ? reason.toString() : '(no reason provided)'} for ${time ? time : 5}m`)
+		})
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
