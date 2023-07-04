@@ -357,7 +357,7 @@ create('sendfile', (msg, args) => {
 		sleep(200)
 		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return false
 	}
-	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) || filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/') || filename.startsWith('.') || filename.startsWith('$') || filename.includes('/../') || filename.includes('/.../') || filename.includes('./') || filename.includes('/.'))) {
+	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) || filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/') || filename.startsWith('.') || filename.startsWith('$') || filename.includes('/../') || filename.includes('/.../') || filename.includes('./') || filename.includes('/.')) {
 		msg.channel.sendTyping()
 		sleep(200)
 		msg.channel.send('File does NOT exists. Abort!'); return false
