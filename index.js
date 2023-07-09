@@ -357,14 +357,30 @@ create('sendfile', (msg, args) => {
 		sleep(200)
 		msg.channel.send('File sender. Provide file name to send available file in `/res/` (do `rx listfile`)'); return false
 	}
-	if(!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) || filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/') || filename.startsWith('.') || filename.startsWith('$') || filename.includes('/../') || filename.includes('/.../') || filename.includes('./') || filename.includes('/.')) {
+	if(/*!fs.existsSync(path.resolve(path.join(process.cwd(), './res/' + filename))) ||*/ filename.startsWith('../') || filename.startsWith('./') || filename.includes('index.js') || filename.startsWith('~/') || filename.startsWith('.') || filename.startsWith('$') || filename.includes('/../') || filename.includes('/.../') || filename.includes('./') || filename.includes('/.')) {
 		msg.channel.sendTyping()
 		sleep(200)
-		msg.channel.send('File does NOT exists. Abort!'); return false
+		msg.channel.send('Illegal file name or the exploit have been patched.'); return false
 	}
-	msg.channel.sendTyping()
-	sleep(100)
-	msg.channel.send({content: filename, files: [path.resolve('./res/' + filename)]})
+	fs.stat(path.resolve(path.join(process.cwd(), './res/' + filename)), (e, s) => {
+		if(e) {
+			msg.channel.send('Unexpected error:\n```' + e + '\n```')
+			return false;
+		}
+		if(s.size <= 0 || !s.size || (!s.size instanceof Number)) {
+			msg.channel.sendTyping()
+			sleep(100)
+			msg.channel.send('The file size is zero, ABORT!')
+			return false;
+		} else {
+			msg.channel.sendTyping()
+			sleep(100)
+			msg.channel.send({content: filename, files: [path.resolve('./res/' + filename)]})
+		}
+	})
+	// msg.channel.sendTyping()
+	// sleep(100)
+	// msg.channel.send({content: filename, files: [path.resolve('./res/' + filename)]})
 })
 
 create('listfile', (msg) => {
@@ -386,7 +402,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9670.20\n- Few tweaks')
+	msg.reply('Update 1.9800.11\n- Rewrite/Renew some file sender mechanics\n- File sender file size enforcement\n- File sender file size enforcement\n- UNIX/POSIX path exploit patched\n- Fews file sender enforcements')
 })
 
 create('bot-security-leak-preview', (msg) => {
