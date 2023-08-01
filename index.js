@@ -1,5 +1,3 @@
-console.clear()
-
 const lginStart = new Date().getTime()
 
 const { Client, GatewayIntentBits, EmbedBuilder, ActivityType, Intents } = require('discord.js')
@@ -11,6 +9,7 @@ const os = require('os')
 const request = require('request')
 const path = require('path')
 const fs = require('fs')
+// require('./rx-ml.js')
 // Handlers
 const { Memory } = require('./handler/memhandler')
 // const ch = require('./handler/cpuhandler')
@@ -21,7 +20,7 @@ requiredir('./server')
 const memChecker = new Memory(30 * 1000);
 memChecker.on('danger', (used, free, total) => console.warn(`-- MEMORY USAGE CAUTION --
 Caught on: ${Date()}
-Details: Memory use exceeded Repl's limit
+Details: Memory usage exceeded Repl's limit
 
 Memory Usage: ${used}
 Total Repl Memory: ${total}
@@ -55,7 +54,7 @@ process.on('uncaughtException', (e) => {
 
 const command = []
 const slashCommand = []
-const devs = ['1010354519495954452', '238859849641754636', '927563409409581066', '752617663888359444', '762771482434600992', '810221998881898507']
+const devs = ['916912179284967434','638396593736777761','1010354519495954452', '238859849641754636', '927563409409581066', '752617663888359444', '762771482434600992', '810221998881898507']
 const bl = [
   "229921633199063040",
   "1096760755174526987"
@@ -83,6 +82,20 @@ const c = new Client({intents:
 
 c.login(process.env['tk'])
 
+// const session = {
+// 	unverf: true,
+// 	pass: async () => {
+// 		this.unverf = false;
+// 		this.passts = Date.now()
+// 		return this
+// 	},
+// 	passts: 0
+// }
+
+// c.on('load', () => { // Plugin hook
+// 	c.login(process.env['tk'])
+// })
+
 c.on('ready', () => {
 	// ----
 	globalThis.lginEnd = new Date().getTime()
@@ -102,7 +115,6 @@ async function sleep(ms) {
 }
 
 c.on('messageCreate', async msg => {
-	const args = msg.content.split(' ')
 	let prefix = 'rx'
 // 	if(msg.content === '<@1107664127289212978>' || '<@!1107664127289212978>' && !args[1] && msg.author.bot === false) {
 // 		msg.channel.send(`RyzanX is a collection of experimental in-dev features built based on RBot core idea. The official alternative solution of TModeration Bot
@@ -129,8 +141,20 @@ c.on('messageCreate', async msg => {
 		msg.channel.send('If you believe this is an error, please report to Henry133#2436')
 		return false;
 	};
+	globalThis.globalThis.lastusage = msg.author.tag
+	globalThis.lastcmd = msg.content
+	// if(session.unverf === true && args[1].toLowerCase() !== 'verify') {
+	// 	msg.channel.send('The session has NOT been verified by our developers.\nAny misuse of the bot in unsafe state may lead to unpredictable consequences.\nPlease wait until our developers verify our session data then enable the bot functionally. Thanks')
+	// 	return false;
+	// } else if(session.unverf === true && args[1].toLowerCase() === 'verify') {
+	// 	session.pass()
+	// 		.then(_ => {msg.channel.send('Session passed sucessfully.\n```js\n' + JSON.stringify(_) + '```')})
+	// 		.catch(e => {msg.channel.send('Something went wrong. Details:\n```js\n' + e + '```')})
+	// } else if(session.unverf === false && args[1].toLowerCase() === 'verify') {
+	// 	msg.channel.send('Already passed session. ABORT!')
+	// 	return false;
+	// }
 	command.forEach(c => {
-		const args = msg.content.split(' ')
 		// let prefix = 'rx'
 		// if(!msg.content.startsWith(prefix)) return false;
 		// if(msg.author.bot === true) return false;
@@ -139,6 +163,8 @@ c.on('messageCreate', async msg => {
 		// 	msg.channel.send('If you believe this is an error, please report to Henry133#2436')
 		// 	return false;
 		// };
+
+		const args = msg.content.split(' ')
 
 		if(args[1].toLowerCase() == c.cn.toLowerCase() && c.cb instanceof Function) {
 			c.cb(msg, args)
@@ -325,6 +351,8 @@ rx bot-security-leak-preview: Henry133 tried to leak his security hole for LIMIT
 rx ban: (Permanently) Ban users for specific reason. Usage: \`rx ban @user reason\` (MENTION ONLY)
 rx kick: Kick users for specific reason. Usage: \`rx kick @user reason\` (MENTION ONLY)
 rx timeout: Timeout members. Usage: \`rx timeout @user duration_in_minutes reason\`
+rx warn: Warn members. Usage: \`rx warn @user reason\`
+rx credits: Credits
 `)
 })
 
@@ -402,7 +430,7 @@ create('updates', (msg) => {
 create('update', (msg) => {
 	msg.channel.sendTyping()
 	sleep(100)
-	msg.reply('Update 1.9800.11\n- Rewrite/Renew some file sender mechanics\n- File sender file size enforcement\n- File sender file size enforcement\n- UNIX/POSIX path exploit patched\n- Fews file sender enforcements')
+	msg.reply('Update 1.9910.18\n- Added dumping function, nothing else')
 })
 
 create('bot-security-leak-preview', (msg) => {
@@ -413,13 +441,23 @@ create('ban', (msg) => {
 	msg.channel.sendTyping()
 	const target = msg.mentions.users.first().id
 	const reason = msg.content.split(' ').slice(3).join(' ')
+	if(!target) {
+		msg.channel.send('Usage: `rx ban @Henry_ reason`')
+		return false
+	}
+	if(!c.users.resolve(target.toString())) {
+		msg.channel.send('User requested not found, please double-check the user and contact our developers.')
+	}
 	msg.guild.bans.create(target, {reason: (reason.toString() ? reason.toString() : '')})
 		.then(_ => {
 			msg.channel.send(`User <@${target}> has been banned by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'}`)
-			msg.guild.members.resolve(target).send(`You have been banned by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'}`)
+			if(c.users.resolve(target).bot === true) {
+				return false;
+			}
+			c.users.resolve(target).send(`You have been banned by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'}`)
 		})
 		.catch(e => {
-			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Ban <@${target}> for ${reason.toString() ? reason.toString() : '(no reason provided)'}`)
+			msg.channel.send(`Encountered error trying to ban <@${target}>.\nDetails: \`\`\`js\nPlease DO NOT report this to Henry or bot developers, they are NOT a bug.\n${e}\n\`\`\``)
 		})
 })
 
@@ -427,13 +465,23 @@ create('kick', (msg) => {
 	msg.channel.sendTyping()
 	const target = msg.guild.members.resolve(msg.mentions.users.first().id)
 	const reason = msg.content.split(' ').slice(3).join(' ')
+	if(!target) {
+		msg.channel.send('Usage: `rx kick @Henry_ reason`')
+		return false
+	}
+	if(!c.users.resolve(target.toString())) {
+		msg.channel.send('User requested not found, please double-check the user and contact our developers.')
+	}
 	target.kick(reason.toString() ? reason.toString() : '')
 		.then(_ => {
 			msg.channel.send(`User <@${target.user.id}> has been kicked by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'}`)
+			if(target.bot === true) {
+				return false;
+			}
 			target.send(`You have been kicked by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'}`)
 		})
 		.catch(e => {
-			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Kick <@${target}> for ${reason.toString() ? reason.toString() : '(no reason provided)'}`)
+			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Kick <@${target.user.id}> for ${reason.toString() ? reason.toString() : '(no reason provided)'}`)
 		})
 })
 
@@ -442,14 +490,62 @@ create('timeout', (msg) => {
 	const target = msg.guild.members.resolve(msg.mentions.users.first().id)
 	const time = parseInt(msg.content.split(' ')[2]) * 1000 * 60
 	const reason = msg.content.split(' ').slice(4).join(' ')
-	target.timeout(time ? time : 5 * 1000 * 60, reason.toString() ? reason.toString() : '')
+	if(!target) {
+		msg.channel.send('Usage: `rx timeout 6 @Henry_ reason` (in minute only)')
+		return false
+	}
+	if(!c.users.resolve(target.toString())) {
+		msg.channel.send('User requested not found, please double-check the user and contact our developers.')
+	}
+	if(!time) {
+		time = 5 * 1000 * 60
+	}
+	target.timeout(time, reason.toString() ? reason.toString() : '')
 		.then(_ => {
 			msg.channel.send(`User <@${target.user.id}> has been timed-out by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'} for ${time ? time : 5}m`)
+			if(target.bot === true) {
+				return false;
+			}
 			target.send(`You have been timed-out by <@${msg.author.id}>, because of ${reason.toString() ? reason.toString() : '(no reason provided.)'} for ${time ? time : 5}m`)
 		})
 		.catch(e => {
 			msg.channel.send(`I dont have enough permissions for that.\nPerformed action: Timeout <@${target}> for ${reason.toString() ? reason.toString() : '(no reason provided)'} for ${time ? time : 5}m`)
 		})
+})
+
+create('warn', (msg) => {
+	try {
+		const target = msg.guild.members.resolve(msg.mentions.users.first().id)
+		const reason = msg.content.split(' ').slice(3).join(' ')
+		msg.channel.send(`User <@${target.user.id}> have been warned by <@${msg.author.id}>. Reason: ${reason.toString() ? reason.toString() : 'no reason provided.'}`)
+		target.send(`You have been warned.\nResponsible Operator: ${msg.author.tag} (${msg.author.id})\nReason: ${reason.toString() ? reason.toString() : 'no reason provided.'}`)
+	} catch(e) {
+		msg.channel.send('Something went wrong.\n```js\n' + e + '\n```')
+	}
+})
+
+create('credits', (msg) => {
+	const _c = [
+		'RyzanX Lightray Project',
+		'[========== CREDITS ==========]',
+		'- Programmers:',
+		'We send a thanks to the following programmers/developers of the bot:',
+		'> Main program: Henry133, Link Safe, 4TechGuns',
+		'> Bot design: Henry133',
+		'> Project Owner: Henry133',
+		'> Bugfixes: Henry133, 4TechGuns, kiwi birb',
+		'> Advertiser: Henry133',
+		'> Advanced programming: Henry133, 4TechGuns',
+		'** **',
+		'- Other contributors:',
+		'Uncategoried: kiwi birb, Link Safe, Nullman, XenoYT',
+		'[========== RYZANX ==========]'
+	]
+
+	_c.forEach(item => {
+		msg.channel.send(item)
+		sleep(320)
+	})
 })
 
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
@@ -461,20 +557,122 @@ process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', promise, 'reason:', reason)
 	const childp = require('child_process')
 	async function exiterr() {process.exit(-1)}
+	fs.writeFileSync(path.resolve('./ereport') + `/err_${Date.now()}`, `
+------------- RyzanX Crash Dump -------------
 
-	exiterr().then(_ => {child_process.spawn('node', './rsAssist.js')})
+* A fatal error has been caught by the error handler and there are useful informations.
+* Dumping give us useful info about bugs and how we going to fix it.
+* RyzanX Crash Dump only give the information that is collectable, even with useless one. Please ignore useless informations.
+*
+* Fault: unhandledRejection dumpid 0x12fc
+*
+* Please, send this bug report if it is not RyzanX fault!
+
+
+Crashing date: ${Date()} (ts ${Date.now()})
+Process: args ${process.argv.toString()} proctitl ${process.title} pid ${process.pid} prio ${os.getPriority()}
+
+------------- S Y S T E M -------------
+
+OS: platform ${os.platform()}
+CPU: total ${os.cpus().length}
+\\- [0] ${os.cpus()[0].model} spd ${os.cpus()[0].speed}
+
+------------- P R O C E S S -------------
+
+Process: args ${process.argv.toString()} proctitl ${process.title} pid ${process.pid} prio ${os.getPriority()}
+Environment: softwarearch ${os.arch()} hardwarearch ${os.machine()}
+Crash cause: unhand reject ${JSON.stringify(promise)} reason ${reason}
+
+------------- U S A G E -------------
+
+Last usage by: ${globalThis.lastusage}
+Last usage command: ${lastcmd}
+
+------------- R E P O R T -------------
+
+RAM usage: ${os.freemem() / os.totalmem() * 100}%
+
+------------- RyzanX Crash Dump -------------
+`,
+  {
+    encoding: "utf8",
+    flag: "w+",
+    mode: 0o666
+  }, (err) => {
+		if(err) {
+			process.stdout.write('[ERROR/FATAL] Failed writing thread dump, trying to restart RyzanX...')
+		} else {
+			process.stdout.write(`[INFO] Sucessfully dumped RyzanX error. Current timestamp: ${Date.now()}`)
+			process.stdout.write(`[WARN/ERROR] Error: promise ${promise} reason ${reason}`)
+			process.stdout.write(`[INFO] Attemping to restart RyzanX!`)
+		}
+})
+	exiterr().then(_ => {childp.spawn('node', './rsAssist.js')})
 });
 
 process.on('uncaughtException', (error) => {
   console.log('Error: ' + error)
 	const childp = require('child_process')
 	async function exiterr() {process.exit(-1)}
+	fs.writeFileSync(path.resolve('./ereport') + `/err_${Date.now()}`, `
+------------- RyzanX Crash Dump -------------
 
-	exiterr().then(_ => {child_process.spawn('node', './rsAssist.js')})
+* A fatal error has been caught by the error handler and there are useful informations.
+* Dumping give us useful info about bugs and how we going to fix it.
+* RyzanX Crash Dump only give the information that is collectable, even with useless one. Please ignore useless informations.
+*
+* Fault: uncaughtException dumpid 0x281
+*
+* Please, send this bug report if it is not RyzanX fault!
+
+
+Crashing date: ${Date()} (ts ${Date.now()})
+Process: args ${process.argv.toString()} proctitl ${process.title} pid ${process.pid} prio ${os.getPriority()}
+
+------------- S Y S T E M -------------
+
+OS: platform ${os.platform()}
+CPU: total ${os.cpus().length}
+\\- [0] ${os.cpus()[0].model} spd ${os.cpus()[0].speed}
+
+------------- P R O C E S S -------------
+
+Process: args ${process.argv.toString()} proctitl ${process.title} pid ${process.pid} prio ${os.getPriority()}
+Environment: softwarearch ${os.arch()} hardwarearch ${os.machine()}
+Crash cause: uncaught exception\n${error}
+
+------------- U S A G E -------------
+
+Last usage by: ${globalThis.lastusage}
+Last usage command: ${lastcmd}
+
+------------- R E P O R T -------------
+
+RAM usage: ${os.freemem() / os.totalmem() * 100}%
+
+------------- RyzanX Crash Dump -------------
+`,
+  {
+    encoding: "utf8",
+    flag: "w+",
+    mode: 0o666
+  }, (err) => {
+		if(err) {
+			process.stdout.write('[ERROR/FATAL] Failed writing thread dump, trying to restart RyzanX...')
+		} else {
+			process.stdout.write(`[INFO] Sucessfully dumped RyzanX error. Current timestamp: ${Date.now()}`)
+			process.stdout.write(`[WARN/ERROR] Error:\n${error}`)
+			process.stdout.write(`[INFO] Attemping to restart RyzanX!`)
+		}
+	})
+	exiterr().then(_ => {childp.spawn('node', './rsAssist.js')})
 });
 // process.on('SIGKILL', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 
 
 module.exports = {
-	client: c
+	client: c,
+	commands: command,
+	create: create,
 }
