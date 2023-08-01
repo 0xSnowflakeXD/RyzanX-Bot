@@ -669,10 +669,3 @@ RAM usage: ${os.freemem() / os.totalmem() * 100}%
 	exiterr().then(_ => {childp.spawn('node', './rsAssist.js')})
 });
 // process.on('SIGKILL', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
-
-
-module.exports = {
-	client: c,
-	commands: command,
-	create: create,
-}
