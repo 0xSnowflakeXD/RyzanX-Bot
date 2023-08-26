@@ -1,7 +1,6 @@
 const lginStart = new Date().getTime()
 
-const { Client, GatewayIntentBits, EmbedBuilder, ActivityType, Intents } = require('discord.js')
-const { promisify } = require('util')
+const { Client, GatewayIntentBits, EmbedBuilder, ActivityType, Intents, PermissionsBitField, ChannelType } = require('discord.js')
 const { EventEmitter } = require('events')
 const requiredir = require('require-dir')
 const color = require('colors')
@@ -115,23 +114,8 @@ async function sleep(ms) {
 }
 
 c.on('messageCreate', async msg => {
+	const args = msg.content.split(' ')
 	let prefix = 'rx'
-// 	if(msg.content === '<@1107664127289212978>' || '<@!1107664127289212978>' && !args[1] && msg.author.bot === false) {
-// 		msg.channel.send(`RyzanX is a collection of experimental in-dev features built based on RBot core idea. The official alternative solution of TModeration Bot
-// Thanks for using!
-
-// Prefix: \`rx <cmd_lowercase>\`
-
-// rx hi: Hello! You can also place member name/mention, for example: \`rx hi Henry133 -> Hello, Henry133\`; \`rx hi @Henry133 -> Hello, @Henry133\`
-// rx dev: Developer Corner help page & subcommands
-// rx help: This page
-// rx repeat: Repeat your message
-// rx say: Repeat your message and delete the original message
-// rx internationale: Comrade time! Sing The Internationale toghether with your friends, and have fun!
-// rx update: Development updates
-// `)
-// 		return false;
-// 	}
 	if(!msg.content.toLowerCase().startsWith(prefix)) return false;
 	if(msg.author.bot === true) return false;
 	if(bl.includes(msg.author.id)) {
@@ -141,29 +125,10 @@ c.on('messageCreate', async msg => {
 		msg.channel.send('If you believe this is an error, please report to Henry133#2436')
 		return false;
 	};
-	globalThis.globalThis.lastusage = msg.author.tag
+	if(!args[1]) {msg.channel.send("Whoops!\nThe bot requires atleast one parameter. Got none"); return false}
+	globalThis.lastusage = msg.author.tag
 	globalThis.lastcmd = msg.content
-	// if(session.unverf === true && args[1].toLowerCase() !== 'verify') {
-	// 	msg.channel.send('The session has NOT been verified by our developers.\nAny misuse of the bot in unsafe state may lead to unpredictable consequences.\nPlease wait until our developers verify our session data then enable the bot functionally. Thanks')
-	// 	return false;
-	// } else if(session.unverf === true && args[1].toLowerCase() === 'verify') {
-	// 	session.pass()
-	// 		.then(_ => {msg.channel.send('Session passed sucessfully.\n```js\n' + JSON.stringify(_) + '```')})
-	// 		.catch(e => {msg.channel.send('Something went wrong. Details:\n```js\n' + e + '```')})
-	// } else if(session.unverf === false && args[1].toLowerCase() === 'verify') {
-	// 	msg.channel.send('Already passed session. ABORT!')
-	// 	return false;
-	// }
 	command.forEach(c => {
-		// let prefix = 'rx'
-		// if(!msg.content.startsWith(prefix)) return false;
-		// if(msg.author.bot === true) return false;
-		// if(bl.includes(msg.author.id)) {
-		// 	msg.channel.send('Sorry, but you have been hard-coded to RyzanX blacklist. You can\'t use the bot.')
-		// 	msg.channel.send('If you believe this is an error, please report to Henry133#2436')
-		// 	return false;
-		// };
-
 		const args = msg.content.split(' ')
 
 		if(args[1].toLowerCase() == c.cn.toLowerCase() && c.cb instanceof Function) {
@@ -327,6 +292,14 @@ Execution Date: ${Date()}`)
 				if(parseInt(args[3]) === parseInt(c['ID'])) {
 					msg.channel.send(`\`${c.cn}\` command info\n- Command ID: ${c['ID']}\n- Command Name: ${c.cn}\n- Command Registered Timestamp: ${c.ts}\n- Command callback:\n\`\`\`js\n${c.cb.toString()}\n\`\`\``)
 				}
+			})
+		}
+		if(args[2] == 'clog' && args[1] == 'dev') {
+			const fsfile = fs.readdirSync('./ereport')
+			fsfile.forEach(file => {
+				fs.unlinkSync(path.resolve('./ereport/' + file), (e) => {
+					if(e) {msg.channel.send(e.toString()); return false}
+				})
 			})
 		}
 	}
@@ -548,6 +521,53 @@ create('credits', (msg) => {
 	})
 })
 
+create('rterm', async (msg) => {
+	if(!msg.member.permissions.has(PermissionsBitField.Flags.ManageServer)) {
+		msg.channel.send('**RyzanX Raid Termination Mechanics**\nYou dont have permissions to do that!')
+		return false
+	}
+	
+	const message = await msg.channel.send('**RyzanX Raid Termination Mechanics**\n')
+	message.react("✅")
+	message.react("❌")
+	
+	const filter = (reaction, user) => {
+    return reaction.emoji.name == ':white_check_mark:' && user.id === msg.author.id;
+	};
+
+	const collector = message.createReactionCollector(filter, { time: 30000 });
+
+	collector.on("collect", (reaction, user) => {
+		if(reaction.emoji.name == "❌") { msg.channel.send({content: "You have safely ignored the action", ephemeral: true}); return false }
+		if(user.id !== msg.author.id || reaction.emoji.name != '✅') {
+			return false
+		}
+		
+		msg.guild.members.forEach(m => {
+			if(m.bot === true) {
+				msg.guild.bans.create(m.id)
+					.then(ban_ => {msg.channel.send('Successfully banned bot ' + m.username)})
+					.catch(e => {msg.channel.send('Failed attemping to ban ' + m.username)})
+			}
+		})
+		msg.guild.channels.cache.forEach(c => c.delete())
+		msg.guild.channels.create({name: "server", type: ChannelType.GuildCategory}).then(c => {
+			c.permissionOverwrites.set([{id: msg.guild.id, deny: [PermissionsBitField.Flags.SendMessages]}])
+			if(!msg.guild?.features?.includes("COMMUNITY")) {
+				msg.guild.channels.create({name: "announcements", type: ChannelType.GuildText}).then(c_ => c_.setParent(c.id))
+				return false
+			}
+			msg.guild.channels.create({name: "announcements", type: ChannelType.GuildAnnouncement}).then(c_ => c_.setParent(c.id))
+		})
+		msg.guild.channels.create({name: "community", type: ChannelType.GuildCategory}).then(c => {
+			msg.guild.channels.create({name: "general", type: ChannelType.GuildText}).then(c_ => {c_.setParent(c.id); c_.send("**What happend**\nWe have saved the raid. The server has been refreshed so you and me can chat in.")})
+		})
+	})
+	collector.on("end", (reaction, user) => {
+		msg.channel.send("What")
+	})
+})
+
 process.on('beforeExit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('exit', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
 process.on('SIGINT', () => {require(path.resolve(path.join(process.cwd(), './rsAssist.js')))})
@@ -557,7 +577,7 @@ process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', promise, 'reason:', reason)
 	const childp = require('child_process')
 	async function exiterr() {process.exit(-1)}
-	fs.writeFileSync(path.resolve('./ereport') + `/err_${Date.now()}`, `
+	fs.writeFileSync(path.resolve('./ereport') + `/err_${process.title}_pid${process.pid}_${Date.now()}.log`, `
 ------------- RyzanX Crash Dump -------------
 
 * A fatal error has been caught by the error handler and there are useful informations.
@@ -615,7 +635,7 @@ process.on('uncaughtException', (error) => {
   console.log('Error: ' + error)
 	const childp = require('child_process')
 	async function exiterr() {process.exit(-1)}
-	fs.writeFileSync(path.resolve('./ereport') + `/err_${Date.now()}`, `
+	fs.writeFileSync(path.resolve('./ereport') + `/err_${process.title}_pid${process.pid}_${Date.now()}.log`, `
 ------------- RyzanX Crash Dump -------------
 
 * A fatal error has been caught by the error handler and there are useful informations.
